@@ -30,38 +30,73 @@ Below is a **production-grade Mermaid sequence + flow architecture** using:
 
 ---
 
-# 📊 Mermaid – Full Architecture Flow
+# 📊 Architecture Flow
 
 ```mermaid
-flowchart LR
+flowchart TB
 
-    A[Agency Upload Bulk Loan File] --> B[Azure Blob Storage]
-    B -->|Blob Created Event| C[Event Grid]
+    %% =========================
+    %% Entry Layer
+    %% =========================
+    subgraph Entry Layer
+        APIGateway[Azure API Management]
+        EntryFunction[Azure Function - Intake API]
+    end
 
-    C --> D[Azure Function - Orchestrator<br>Workflow Config Driven]
+    %% =========================
+    %% Intake & Event Layer
+    %% =========================
+    subgraph Intake Layer
+        BlobStorage[(Azure Blob Storage)]
+        EventGrid[(Azure Event Grid)]
+    end
 
-    D --> E[Load Workflow Configuration<br>JSON / Xenhey-style Rules]
+    %% =========================
+    %% Orchestration Layer
+    %% =========================
+    subgraph Orchestration Layer
+        OrchestratorFunction[Azure Function - Orchestrator<br>Workflow Config Driven]
+        WorkflowConfig[(Workflow JSON Configuration)]
+    end
 
-    D --> F[Parse & Validate File]
-    F --> G[Chunk Records into Batches]
+    %% =========================
+    %% Messaging Layer
+    %% =========================
+    subgraph Messaging Layer
+        ServiceBusTopic[Azure Service Bus Topic]
+        ServiceBusDLQ[Dead Letter Queue]
+    end
 
-    G --> H[Azure Service Bus Topic<br>loan-processing-topic]
+    %% =========================
+    %% Processing + AI Layer
+    %% =========================
+    subgraph Processing Layer
+        ProcessorFunction[Azure Function - AI Processor]
+        AzureOpenAI[(Azure OpenAI - ChatGPT)]
+    end
 
-    H --> I[Azure Function - Processor]
-    
-    I --> J[Call Azure OpenAI<br>ChatGPT Risk/Classification]
-    
-    J --> K[Enrich Loan Record<br>Risk Score / Summary / Flags]
-    
-    K --> L[Azure SQL - Staging Table]
-    
-    L --> M[Stored Procedure<br>Transform to Reporting Model]
-    
-    M --> N[Azure SQL Reporting Tables]
+    %% =========================
+    %% Data Layer
+    %% =========================
+    subgraph Data Layer
+        AzureSQLStaging[(Azure SQL - Staging)]
+        AzureSQLReporting[(Azure SQL - Reporting)]
+    end
 
-    N --> O[Event Grid Notification<br>Processing Completed]
-    
-    O --> P[Power BI / API / AI Reporting UI]
+    %% =========================
+    %% Flow Connections
+    %% =========================
+    APIGateway --> EntryFunction
+    EntryFunction --> BlobStorage
+    BlobStorage --> EventGrid
+    EventGrid --> OrchestratorFunction
+    OrchestratorFunction --> WorkflowConfig
+    OrchestratorFunction --> ServiceBusTopic
+    ServiceBusTopic --> ProcessorFunction
+    ProcessorFunction --> AzureOpenAI
+    ProcessorFunction --> AzureSQLStaging
+    AzureSQLStaging --> AzureSQLReporting
+    ServiceBusTopic --> ServiceBusDLQ
 ```
 
 ---
@@ -208,72 +243,6 @@ Inserted directly into staging.
 
 # 🔥 Logical Architecture Layers
 
-```mermaid
-flowchart TB
-
-    %% =========================
-    %% Entry Layer
-    %% =========================
-    subgraph Entry Layer
-        APIGateway[Azure API Management]
-        EntryFunction[Azure Function - Intake API]
-    end
-
-    %% =========================
-    %% Intake & Event Layer
-    %% =========================
-    subgraph Intake Layer
-        BlobStorage[(Azure Blob Storage)]
-        EventGrid[(Azure Event Grid)]
-    end
-
-    %% =========================
-    %% Orchestration Layer
-    %% =========================
-    subgraph Orchestration Layer
-        OrchestratorFunction[Azure Function - Orchestrator<br>Workflow Config Driven]
-        WorkflowConfig[(Workflow JSON Configuration)]
-    end
-
-    %% =========================
-    %% Messaging Layer
-    %% =========================
-    subgraph Messaging Layer
-        ServiceBusTopic[Azure Service Bus Topic]
-        ServiceBusDLQ[Dead Letter Queue]
-    end
-
-    %% =========================
-    %% Processing + AI Layer
-    %% =========================
-    subgraph Processing Layer
-        ProcessorFunction[Azure Function - AI Processor]
-        AzureOpenAI[(Azure OpenAI - ChatGPT)]
-    end
-
-    %% =========================
-    %% Data Layer
-    %% =========================
-    subgraph Data Layer
-        AzureSQLStaging[(Azure SQL - Staging)]
-        AzureSQLReporting[(Azure SQL - Reporting)]
-    end
-
-    %% =========================
-    %% Flow Connections
-    %% =========================
-    APIGateway --> EntryFunction
-    EntryFunction --> BlobStorage
-    BlobStorage --> EventGrid
-    EventGrid --> OrchestratorFunction
-    OrchestratorFunction --> WorkflowConfig
-    OrchestratorFunction --> ServiceBusTopic
-    ServiceBusTopic --> ProcessorFunction
-    ProcessorFunction --> AzureOpenAI
-    ProcessorFunction --> AzureSQLStaging
-    AzureSQLStaging --> AzureSQLReporting
-    ServiceBusTopic --> ServiceBusDLQ
-```
 ---
 
 # 📈 Why This Architecture Is Powerful
