@@ -273,7 +273,7 @@ flowchart TB
     ProcessorFunction --> AzureSQLStaging
     AzureSQLStaging --> AzureSQLReporting
     ServiceBusTopic --> ServiceBusDLQ
-
+```
 ---
 
 # 📈 Why This Architecture Is Powerful
