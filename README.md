@@ -136,26 +136,7 @@ sequenceDiagram
 
 ---
 
-# 🧠 Workflow Configuration Model (Config-Driven)
 
-Instead of hardcoding logic, Azure Function loads config like:
-
-```json
-{
-  "WorkflowName": "BulkLoanIngestion",
-  "Steps": [
-    { "Step": "ValidateSchema", "Enabled": true },
-    { "Step": "NormalizeData", "Enabled": true },
-    { "Step": "ChunkRecords", "BatchSize": 500 },
-    { "Step": "AIEnrichment", "Enabled": true, "Model": "gpt-4o" },
-    { "Step": "InsertToSQL", "Enabled": true }
-  ],
-  "RetryPolicy": {
-    "MaxAttempts": 5,
-    "DeadLetterEnabled": true
-  }
-}
-```
 
 This aligns well with your **Xenhey workflow runtime** concept.
 
