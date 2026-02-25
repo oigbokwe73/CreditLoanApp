@@ -239,8 +239,8 @@ flowchart TB
     %% Messaging Layer
     %% =========================
     subgraph Messaging Layer
-        ServiceBusTopic[(Azure Service Bus Topic)]
-        ServiceBusDLQ[(Dead Letter Queue)]
+        ServiceBusTopic[Azure Service Bus Topic]
+        ServiceBusDLQ[Dead Letter Queue]
     end
 
     %% =========================
