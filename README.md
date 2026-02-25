@@ -1,32 +1,13 @@
 # Credit Loan Applicants
 
 
-
-Perfect — let’s design this the way **you would architect it** in a regulated finance environment: event-driven, decoupled, chunk-safe, AI-augmented, and SQL-optimized.
-
-Below is a **production-grade Mermaid sequence + flow architecture** using:
-
-* **Azure Functions (Workflow Config Driven)**
-* **Azure OpenAI (ChatGPT)**
-* **Azure Blob Storage**
-* **Azure Event Grid**
-* **Azure Service Bus (chunk handling + retry + DLQ)**
-* **Azure SQL Database**
+## 📘 Use Case: Bulk Loan Application Ingestion + AI-Powered Natural Language Reporting on Azure
 
 ---
 
-# 🏗️ End-to-End Architecture Overview
+# 🔥 Executive Summary (5 Lines)
 
-## 🔹 Flow Summary
-
-1. Agency uploads bulk loan file
-2. Blob triggers Function
-3. Function reads workflow config
-4. File parsed + chunked
-5. Chunks sent to Service Bus
-6. AI enrichment (ChatGPT)
-7. Insert to Azure SQL
-8. Event Grid sends notifications
+Bulk loan files from agencies are ingested into Azure via secure Blob upload and processed using Azure Functions into Azure SQL. Clean structured data supports advanced reporting. Azure OpenAI converts natural language into secure SQL queries. Results are summarized intelligently for executives. The system transforms static reporting into conversational financial intelligence.
 
 ---
 
