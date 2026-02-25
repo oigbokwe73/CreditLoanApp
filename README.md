@@ -5,7 +5,7 @@
 
 ---
 
-# 🔥 Executive Summary (5 Lines)
+# 🔥 Executive Summary
 
 Bulk loan files from agencies are ingested into Azure via secure Blob upload and processed using Azure Functions into Azure SQL. Clean structured data supports advanced reporting. Azure OpenAI converts natural language into secure SQL queries. Results are summarized intelligently for executives. The system transforms static reporting into conversational financial intelligence.
 
