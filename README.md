@@ -272,7 +272,7 @@ flowchart TB
     ProcessorFunction --> AzureOpenAI
     ProcessorFunction --> AzureSQLStaging
     AzureSQLStaging --> AzureSQLReporting
-    ServiceBusTopic --> ServiceBusDLQ```
+    ServiceBusTopic --> ServiceBusDLQ
 
 ---
 
