@@ -13,7 +13,7 @@ Below is the **updated Mermaid diagram** where the **CSV file goes directly to t
 
 ---
 
-# Updated End-to-End Architecture
+# End-to-End Architecture
 
 ```mermaid
 flowchart TD
@@ -79,7 +79,7 @@ M --> S[Visualization Layer<br>Reports / Charts / Dashboards]
 
 ---
 
-# Updated Logical Architecture
+# Logical Architecture
 
 ```mermaid
 flowchart LR
