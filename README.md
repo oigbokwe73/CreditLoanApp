@@ -32,9 +32,7 @@ B --> C[Data Validation & Schema Mapping]
 
 C --> D[Transform CSV → Structured JSON]
 
-D --> E[Azure SQL Stored Procedure<br>usp_InsertCreditApplications]
-
-E --> F[(Azure SQL Database<br>creditapplication Table)]
+D --> F[(Azure SQL Database<br>creditapplication Table)]
 
 %% =============================
 %% TRADITIONAL SEARCH FLOW
