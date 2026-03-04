@@ -15,9 +15,6 @@ To enhance accessibility and analytics capabilities, the platform will introduce
 
 This hybrid architecture combines **reliable transactional processing with modern conversational intelligence**, allowing Fringe Financial to deliver faster insights, improved user experiences, and advanced reporting without requiring a full rebuild of its existing database and application stack.
 
-
-Below is the **updated Mermaid diagram** where the **CSV file goes directly to the Azure Function CSV Parser**, removing **Blob Storage** and **Event Grid** as requested.
-
 ---
 
 # End-to-End Architecture
