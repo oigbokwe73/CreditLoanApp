@@ -57,7 +57,7 @@ end
 %% =============================
 
 subgraph AI_Search_NLP
-N[User Natural Language Prompt<br>"Show debt consolidation loans with credit score above 720"]
+N[User Natural Language Prompt  Show debt consolidation loans with credit score above 720]
 
 N --> O[ChatGPT / Azure OpenAI]
 
