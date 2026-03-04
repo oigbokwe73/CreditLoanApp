@@ -34,9 +34,9 @@ B --> C[Data Validation & Schema Mapping]
 
 C --> D[Transform to Structured JSON]
 
-D --> E[Azure SQL Stored Procedure<br>usp_InsertCreditApplications]
+D --> E[Azure SQL Stored Procedure usp_InsertCreditApplications]
 
-E --> F[(Azure SQL Database<br>creditapplication Table)]
+E --> F[(Azure SQL Database creditapplication Table)]
 
 %% =============================
 %% TRADITIONAL SEARCH FLOW
@@ -49,7 +49,7 @@ J --> K[Convert Form Data to JSON]
 
 K --> L[REST API Endpoint]
 
-L --> M[Execute Stored Procedure<br>usp_GetCreditApplications]
+L --> M[Execute Stored Procedure usp_GetCreditApplications]
 
 M --> H
 
@@ -72,7 +72,7 @@ Q --> R[System Prompt<br>SQL Expert for Azure SQL]
 
 R --> S[Convert NLP → Structured Query Parameters]
 
-S --> T[Generate Stored Procedure Call<br>usp_GetCreditApplications]
+S --> T[Generate Stored Procedure Call usp_GetCreditApplications]
 
 T --> L
 
@@ -82,7 +82,7 @@ end
 %% RESPONSE FLOW
 %% =============================
 
-O --> U[Visualization Layer<br>Charts / Tables / Reports]
+O --> U[Visualization Layer Charts / Tables / Reports]
 
 ```
 
