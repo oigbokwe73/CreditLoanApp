@@ -7,7 +7,14 @@
 
 # 🔥 Executive Summary
 
-Bulk loan files from agencies are ingested into Azure via secure Blob upload and processed using Azure Functions into Azure SQL. Clean structured data supports advanced reporting. OpenAI converts natural language into secure SQL queries. Results are summarized intelligently for executives. The system transforms static reporting into conversational financial intelligence.
+Fringe Financial Services is modernizing its loan data platform by introducing a scalable **Azure-based ingestion and intelligent search architecture** while preserving existing operational systems. Loan application records will be **bulk uploaded via an Azure Function upload service**, where CSV or structured files are validated, transformed, and securely inserted into **Azure SQL Database** using the organization’s existing stored procedures. This approach ensures seamless integration with current data models and minimizes disruption to established processes.
+
+End users will continue to leverage the **traditional search interface** to retrieve loan information using familiar filters and queries, maintaining compatibility with the existing application workflows and stored procedures already optimized for performance and reporting.
+
+To enhance accessibility and analytics capabilities, the platform will introduce an **AI-powered Natural Language Processing (NLP) layer** that allows users to interact with the system using **voice or conversational chat**. Through integration with **Azure OpenAI**, user prompts will be interpreted and translated into structured stored procedure calls, enabling natural language questions such as *“Show debt consolidation loans with credit scores above 720”* to generate the same results as traditional queries.
+
+This hybrid architecture combines **reliable transactional processing with modern conversational intelligence**, allowing Fringe Financial to deliver faster insights, improved user experiences, and advanced reporting without requiring a full rebuild of its existing database and application stack.
+
 
 Below is the **updated Mermaid diagram** where the **CSV file goes directly to the Azure Function CSV Parser**, removing **Blob Storage** and **Event Grid** as requested.
 
