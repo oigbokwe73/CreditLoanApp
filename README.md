@@ -291,16 +291,6 @@ This is a **very powerful enterprise pattern**.
 
 ---
 
-If you'd like, I can also generate a **much more advanced enterprise diagram** showing:
-
-* **Azure API Management**
-* **Azure OpenAI**
-* **Service Bus orchestration**
-* **SQL query safety layer**
-* **AI caching**
-* **Power BI dashboards**
-
-This is the **exact architecture used for AI-enabled enterprise reporting platforms.**
 
 ---
 
@@ -314,34 +304,12 @@ This is the **exact architecture used for AI-enabled enterprise reporting platfo
   * Supports **traditional keyword search** and **Natural Language Search**
   * Integrates with **ChatGPT-4.1** to translate natural language questions into structured queries
  
-* **Azure Service Bus**
-
-  * Receives ingestion messages triggered by file arrivals or upstream systems
-  * Decouples producers from consumers for reliable, scalable ingestion
-  * Supports retry, dead-lettering, and ordered message processing
 
 * **Azure SQL Database**
 
   * Stores ingested data using a **predefined relational schema**
   * Optimized for reporting, filtering, aggregations, and Power BI consumption
   * Enforces data integrity, constraints, and indexing strategies
-
-* **Azure Table Storage**
-
-  * Stores ingested data in a **schema-less (NoSQL) format**
-  * Used for raw, semi-structured, or evolving datasets
-
-* **Azure Storage Account (File Share)**
-
-  * Receives inbound files via **SFTP**
-  * Serves as the landing zone for batch and external partner data
-  * Triggers ingestion workflows via storage events
-
-* **Event-Driven Ingestion**
-
-  * Storage events (file create/update) trigger Azure Functions
-  * Functions publish messages to Service Bus for downstream processing
-  * Enables scalable, asynchronous, near-real-time ingestion
 
 * **Azure Application Insights**
 
@@ -355,11 +323,6 @@ This is the **exact architecture used for AI-enabled enterprise reporting platfo
   * ChatGPT-4o interprets intent and generates structured query logic
   * Results returned from SQL or Table Storage through the same API
 
-* **Azure Container Instances (ACI)**
-
-  * Hosts a **secure SFTP server**
-  * Isolated, ephemeral compute with no VM management overhead
-  * Integrates with Azure Storage File Shares for persistence
 
 * **Azure Log Analytics**
 
@@ -377,22 +340,11 @@ Creating a serverless API using Azure that leverages Service Bus to communicate 
    - Create an Azure SQL Database instance.
    - Set up the necessary tables and schemas you'll need for your application.
 
-2. **Create Azure Service Bus**:
-   - Set up an Azure Service Bus namespace.
-   - Within the namespace, create a queue or topic (based on your requirement).
-
 3. **Deploy Serverless API using Azure Functions**:
    - Create a new Azure Function App.
    - Develop an HTTP-triggered function that will act as your API endpoint.
    - In this function, when data is received, send a message to the Service Bus queue or topic.
 
-4. **Deploy 2 Service Bus Triggered Function**:
-   - Create another Azure Function that is triggered by the Service Bus queue or topic.
-   - This function will read the message from the Service Bus and process it. The processing might involve parsing the message and inserting the data into the Azure SQL Database.
-
-5. **Deploy a Timer Triggered Function**:
-   - Create another Azure Function that is triggered when a file is dropped in a container.
-   - This function will stream in a file, read it and place on the service bus topic.
 
 6. **Implement Error Handling**:
    - Ensure that you have error handling in place. If there's a failure in processing the message and inserting it into the database, you might want to log the error or move the message to a dead-letter queue.
@@ -419,10 +371,7 @@ By following these steps, you'll have a serverless API in Azure that uses Servic
 |ApiStore| [Remote Configuration Store]  | Connect to your remote config store
 |ApiKeyName|[API KEY NAME]|Will be passed in the header  :  the file name of the config.
 |AppName| [APPLICATION NAME]| This is the name of the Function App, used in log analytics|
-|StorageAcctName|[STORAGE ACCOUNT NAME]|Example  "AzureWebJobsStorage"|
-|ServiceBusConnectionString|[SERVICE BUS CONNECTION STRING]|Example  "ServiceBusConnectionString".  Recommmended to store in Key vault.|
 |DatabaseConnection|[DATABASE CONNECTION STRING]|Example  "DatabaseConnection". Recommmended to store in Key vault.|
-|TimerInterval|[TIMER_INTERVAL]|Example  "0 */1 * * * *" 1 MIN|
 
 
 > **Note:**  Look at the configuration file in the **Config** Folder and created a Table to record information.
@@ -445,67 +394,6 @@ By following these steps, you'll have a serverless API in Azure that uses Servic
 |[21B8411B3EA24285B52F24B1D968B68A.json](https://www.xenhey.com/api/store/21B8411B3EA24285B52F24B1D968B68A)| **AI Search using Chat GPT Natual Language Processor** |
 
 
-> Create the following blob containers and share in azure storage
-
-|ContainerName|Description|
-|:----|:----|
-|config|Location for the configuration files. Only Required for Managed Storage|
-|pickup|Thes are files that are copied from the SFTP share and dropped in the pickup container |
-|processed|These are files the have been parsed and dropped in th processed container|
-
-|Table|Description|
-|:----|:----|
-|csvbatchfiles|Track the CSV parsed files|
-|training[YYYYMMDD]|N0 SQL DataStore|
-
-
-|Share|Description|
-|:----|:----|
-|training[YYYYMMDD]|Create a share location for SFTP to drop files|
-
-## Service Bus Subscription information
-
-|Subscription Name|Description|
-|:----|:----|
-|request|Create a Topic|
-|nosqlmessage|Create a Subscription|
-|sqlmessage|Create a Subscription|
-
-## Upgrade Storage 
-Update storage account to Azure Data Lake Storage(ADLS) then run the following script 
-## Script provsion an Event Grid
-```powershell
-$subscriptions = ""
-$resourceGroups = "training20260107"
-$storageAccounts = "training20260107"
-$functionAppName = "training20260107"
-$function = "Filedroptrigger"
-$function1 = "FileParser"
-$containerName = "processed"
-$containerName1 = "pickup"
-az eventgrid event-subscription create `
-  --name blob-monitor-processed `
-  --source-resource-id "/subscriptions/$subscriptions/resourceGroups/$resourceGroups/providers/Microsoft.Storage/storageAccounts/$storageAccounts" `
-  --included-event-types Microsoft.Storage.BlobCreated  `
-  --endpoint-type azurefunction `
-  --endpoint "/subscriptions/$subscriptions/resourceGroups/$resourceGroups/providers/Microsoft.Web/sites/$functionAppName/functions/$function" `
-  --advanced-filter data.blobType StringContains BlockBlob `
-  --advanced-filter subject StringBeginsWith "/blobServices/default/containers/$containerName/"
-
-
-  az eventgrid event-subscription create `
-  --name stp `
-  --source-resource-id "/subscriptions/$subscriptions/resourceGroups/$resourceGroups/providers/Microsoft.Storage/storageAccounts/$storageAccounts" `
-  --included-event-types Microsoft.Storage.BlobCreated  `
-  --endpoint-type azurefunction `
-  --endpoint "/subscriptions/$subscriptions/resourceGroups/$resourceGroups/providers/Microsoft.Web/sites/$functionAppName/functions/$function1" `
-  --advanced-filter data.blobType StringContains BlockBlob `
-  --advanced-filter subject StringBeginsWith "/blobServices/default/containers/$containerName1/"
-```
-## Create Azure Container Instance for SFTP
-> User the following link to create a Azure Container Instance(ACI for SFTP)
-> 
-https://docs.microsoft.com/en-us/samples/azure-samples/sftp-creation-template/sftp-on-azure
 
 
 > Kusto Queries used for Application Insights
