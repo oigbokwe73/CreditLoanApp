@@ -10,110 +10,248 @@
 Bulk loan files from agencies are ingested into Azure via secure Blob upload and processed using Azure Functions into Azure SQL. Clean structured data supports advanced reporting. OpenAI converts natural language into secure SQL queries. Results are summarized intelligently for executives. The system transforms static reporting into conversational financial intelligence.
 
 ---
+Below is a **detailed Mermaid architecture + workflow diagram** showing the **two search paths** you described:
 
-# 📊 Architecture Flow
+1. **Traditional Search Flow** (Form → JSON → Stored Procedure → Azure SQL)
+2. **AI / NLP Search Flow** (Prompt → System Prompt → SQL Script → Stored Procedure → Azure SQL)
+
+It also includes the **data ingestion path** from **CSV → Azure Function → Azure SQL**.
+
+---
+
+# End-to-End Data and Search Architecture
 
 ```mermaid
-flowchart TB
+flowchart TD
 
-    %% =========================
-    %% Entry Layer
-    %% =========================
-    subgraph Entry Layer
-        APIGateway[Azure API Management]
-        EntryFunction[Azure Function - Intake API]
-    end
+%% =============================
+%% DATA INGESTION PIPELINE
+%% =============================
 
-    %% =========================
-    %% Intake & Event Layer
-    %% =========================
-    subgraph Intake Layer
-        BlobStorage[(Azure Blob Storage)]
-        EventGrid[(Azure Event Grid)]
-    end
+A[User Uploads CSV File] --> B[Azure Function - CSV Parser]
 
-    %% =========================
-    %% Orchestration Layer
-    %% =========================
-    subgraph Orchestration Layer
-        OrchestratorFunction[Azure Function - Orchestrator<br>Workflow Config Driven]
-        WorkflowConfig[(Workflow JSON Configuration)]
-    end
+B --> C[Data Validation & Schema Mapping]
 
-    %% =========================
-    %% Messaging Layer
-    %% =========================
-    subgraph Messaging Layer
-        ServiceBusTopic[Azure Service Bus Topic]
-        ServiceBusDLQ[Dead Letter Queue]
-    end
+C --> D[Transform to Structured JSON]
 
-    %% =========================
-    %% Processing + AI Layer
-    %% =========================
-    subgraph Processing Layer
-        ProcessorFunction[Azure Function - AI Processor]
-        AzureOpenAI[(Azure OpenAI - ChatGPT)]
-    end
+D --> E[Azure SQL Stored Procedure<br>usp_InsertCreditApplications]
 
-    %% =========================
-    %% Data Layer
-    %% =========================
-    subgraph Data Layer
-        AzureSQLStaging[(Azure SQL - Staging)]
-        AzureSQLReporting[(Azure SQL - Reporting)]
-    end
+E --> F[(Azure SQL Database<br>creditapplication Table)]
 
-    %% =========================
-    %% Flow Connections
-    %% =========================
-    APIGateway --> EntryFunction
-    EntryFunction --> BlobStorage
-    BlobStorage --> EventGrid
-    EventGrid --> OrchestratorFunction
-    OrchestratorFunction --> WorkflowConfig
-    OrchestratorFunction --> ServiceBusTopic
-    ServiceBusTopic --> ProcessorFunction
-    ProcessorFunction --> AzureOpenAI
-    ProcessorFunction --> AzureSQLStaging
-    AzureSQLStaging --> AzureSQLReporting
-    ServiceBusTopic --> ServiceBusDLQ
+%% =============================
+%% TRADITIONAL SEARCH FLOW
+%% =============================
+
+subgraph Traditional_Search
+I[Web Search Form] --> J[User Inputs Filters<br>Credit Score, Purpose, Income]
+
+J --> K[Convert Form Data to JSON]
+
+K --> L[REST API Endpoint]
+
+L --> M[Execute Stored Procedure<br>usp_GetCreditApplications]
+
+M --> H
+
+H --> N[Return Query Results JSON]
+
+N --> O[Render Results<br>HTML Table / Dashboard]
+
+end
+
+%% =============================
+%% AI / NLP SEARCH FLOW
+%% =============================
+
+subgraph AI_Search_NLP
+P[User Natural Language Prompt<br>"Show debt consolidation loans with credit score above 720"]
+
+P --> Q[ChatGPT / Azure OpenAI]
+
+Q --> R[System Prompt<br>SQL Expert for Azure SQL]
+
+R --> S[Convert NLP → Structured Query Parameters]
+
+S --> T[Generate Stored Procedure Call<br>usp_GetCreditApplications]
+
+T --> L
+
+end
+
+%% =============================
+%% RESPONSE FLOW
+%% =============================
+
+O --> U[Visualization Layer<br>Charts / Tables / Reports]
+
 ```
 
 ---
 
-# 🔄 Detailed Sequence Diagram
+# Logical Architecture Layers
+
+```mermaid
+flowchart LR
+
+subgraph Data_Ingestion
+A1[CSV Upload]
+A2[Blob Storage]
+A3[Event Grid]
+A4[Azure Function Parser]
+A5[SQL Insert Stored Procedure]
+A6[(Azure SQL Database)]
+end
+
+subgraph Traditional_Search
+B1[Web Form UI]
+B2[Form → JSON Converter]
+B3[REST API]
+B4[Stored Procedure Execution]
+end
+
+subgraph AI_Search
+C1[User Prompt]
+C2[ChatGPT / Azure OpenAI]
+C3[System Prompt<br>Azure SQL Expert]
+C4[NLP → SQL Parameters]
+C5[Stored Procedure Execution]
+end
+
+A1 --> A2 --> A3 --> A4 --> A5 --> A6
+
+B1 --> B2 --> B3 --> B4 --> A6
+
+C1 --> C2 --> C3 --> C4 --> C5 --> A6
+```
+
+---
+
+# NLP to SQL Workflow
 
 ```mermaid
 sequenceDiagram
-    participant Agency
-    participant Blob
-    participant EventGrid
-    participant OrchestratorFunc
-    participant ServiceBus
-    participant ProcessorFunc
-    participant OpenAI
-    participant AzureSQL
 
-    Agency->>Blob: Upload Bulk Loan CSV/JSON
-    Blob->>EventGrid: BlobCreated Event
-    EventGrid->>OrchestratorFunc: Trigger Execution
+participant User
+participant WebApp
+participant OpenAI
+participant API
+participant SQL
 
-    OrchestratorFunc->>OrchestratorFunc: Load Workflow Config
-    OrchestratorFunc->>Blob: Read File
-    OrchestratorFunc->>OrchestratorFunc: Validate + Normalize
-    OrchestratorFunc->>ServiceBus: Send Chunked Messages
+User->>WebApp: Natural Language Question
+WebApp->>OpenAI: Send Prompt + System Prompt
 
-    ServiceBus->>ProcessorFunc: Deliver Chunk Batch
-    ProcessorFunc->>OpenAI: Enrich Loan Data (Risk / NLP)
-    OpenAI-->>ProcessorFunc: AI Response (JSON Structured)
-    ProcessorFunc->>AzureSQL: Insert into Staging
+OpenAI->>OpenAI: Convert NLP to SQL Parameters
 
-    AzureSQL->>AzureSQL: Execute Transform SP
-    AzureSQL-->>ProcessorFunc: Success Ack
+OpenAI-->>WebApp: Stored Procedure Call
 
-    ProcessorFunc->>EventGrid: Processing Complete Event
+WebApp->>API: Execute Query
+
+API->>SQL: EXEC usp_GetCreditApplications
+
+SQL-->>API: Result Set
+
+API-->>WebApp: JSON Results
+
+WebApp-->>User: Render Table / Dashboard
 ```
+
+---
+
+# Example System Prompt (SQL Expert)
+
+Used in the **AI search flow**.
+
+```text
+You are an Azure SQL expert.
+
+Your task is to convert natural language questions into
+stored procedure calls.
+
+Database Table:
+creditapplication
+
+Fields:
+LoanID
+CustomerID
+CurrentLoanAmount
+CreditScore
+AnnualIncome
+Years_in_current_job
+Term
+Home_Ownership
+Purpose
+
+Rules:
+Always return a stored procedure call.
+
+Example:
+EXEC usp_GetCreditApplications
+ @MinCreditScore = 700,
+ @MaxCreditScore = 750,
+ @Purpose = 'Debt Consolidation'
+```
+
+---
+
+# Example NLP Query
+
+User asks:
+
+```
+Show debt consolidation loans with credit score between 720 and 750
+```
+
+AI generates:
+
+```sql
+EXEC usp_GetCreditApplications
+ @MinCreditScore = 720,
+ @MaxCreditScore = 750,
+ @Purpose = 'Debt Consolidation'
+```
+
+---
+
+# Architecture Benefits
+
+**Traditional Search**
+
+• Simple form driven queries
+• Predictable filtering
+• Fast execution
+
+**AI Search**
+
+• Natural language queries
+• Executive-friendly data exploration
+• Works without building new UI filters
+
+**Combined Model**
+
+You support **both**:
+
+```
+Search Form UI
+        +
+AI Prompt Interface
+        ↓
+Same SQL Stored Procedures
+```
+
+This is a **very powerful enterprise pattern**.
+
+---
+
+If you'd like, I can also generate a **much more advanced enterprise diagram** showing:
+
+* **Azure API Management**
+* **Azure OpenAI**
+* **Service Bus orchestration**
+* **SQL query safety layer**
+* **AI caching**
+* **Power BI dashboards**
+
+This is the **exact architecture used for AI-enabled enterprise reporting platforms.**
 
 ---
 
