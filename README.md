@@ -9,17 +9,11 @@
 
 Bulk loan files from agencies are ingested into Azure via secure Blob upload and processed using Azure Functions into Azure SQL. Clean structured data supports advanced reporting. OpenAI converts natural language into secure SQL queries. Results are summarized intelligently for executives. The system transforms static reporting into conversational financial intelligence.
 
----
-Below is a **detailed Mermaid architecture + workflow diagram** showing the **two search paths** you described:
-
-1. **Traditional Search Flow** (Form → JSON → Stored Procedure → Azure SQL)
-2. **AI / NLP Search Flow** (Prompt → System Prompt → SQL Script → Stored Procedure → Azure SQL)
-
-It also includes the **data ingestion path** from **CSV → Azure Function → Azure SQL**.
+Below is the **updated Mermaid diagram** where the **CSV file goes directly to the Azure Function CSV Parser**, removing **Blob Storage** and **Event Grid** as requested.
 
 ---
 
-# End-to-End Data and Search Architecture
+# Updated End-to-End Architecture
 
 ```mermaid
 flowchart TD
@@ -32,31 +26,30 @@ A[User Uploads CSV File] --> B[Azure Function - CSV Parser]
 
 B --> C[Data Validation & Schema Mapping]
 
-C --> D[Transform to Structured JSON]
+C --> D[Transform CSV → Structured JSON]
 
-D --> E[Azure SQL Stored Procedure usp_InsertCreditApplications]
+D --> E[Azure SQL Stored Procedure<br>usp_InsertCreditApplications]
 
-E --> F[(Azure SQL Database creditapplication Table)]
+E --> F[(Azure SQL Database<br>creditapplication Table)]
 
 %% =============================
 %% TRADITIONAL SEARCH FLOW
 %% =============================
 
 subgraph Traditional_Search
-I[Web Search Form] --> J[User Inputs Filters Credit Score, Purpose, Income]
+G[Web Search Form] --> H[User Inputs Filters<br>Credit Score, Purpose, Income]
 
-J --> K[Convert Form Data to JSON]
+H --> I[Convert Form Input → JSON]
 
-K --> L[REST API Endpoint]
+I --> J[REST API Endpoint]
 
-L --> M[Execute Stored Procedure usp_GetCreditApplications]
+J --> K[Execute Stored Procedure<br>usp_GetCreditApplications]
 
-M --> H
+K --> F
 
-H --> N[Return Query Results JSON]
+F --> L[Return Query Results JSON]
 
-N --> O[Render Results<br>HTML Table / Dashboard]
-
+L --> M[Render Results<br>HTML Table / Dashboard]
 end
 
 %% =============================
@@ -64,47 +57,44 @@ end
 %% =============================
 
 subgraph AI_Search_NLP
-P[User Natural Language Prompt<br>"Show debt consolidation loans with credit score above 720"]
+N[User Natural Language Prompt<br>"Show debt consolidation loans with credit score above 720"]
 
-P --> Q[ChatGPT / Azure OpenAI]
+N --> O[ChatGPT / Azure OpenAI]
 
-Q --> R[System Prompt<br>SQL Expert for Azure SQL]
+O --> P[System Prompt<br>Azure SQL Expert]
 
-R --> S[Convert NLP → Structured Query Parameters]
+P --> Q[Convert NLP → SQL Parameters]
 
-S --> T[Generate Stored Procedure Call usp_GetCreditApplications]
+Q --> R[Generate Stored Procedure Call<br>usp_GetCreditApplications]
 
-T --> L
-
+R --> J
 end
 
 %% =============================
-%% RESPONSE FLOW
+%% RESPONSE LAYER
 %% =============================
 
-O --> U[Visualization Layer Charts / Tables / Reports]
-
+M --> S[Visualization Layer<br>Reports / Charts / Dashboards]
 ```
 
 ---
 
-# Logical Architecture Layers
+# Updated Logical Architecture
 
 ```mermaid
 flowchart LR
 
 subgraph Data_Ingestion
 A1[CSV Upload]
-A2[Blob Storage]
-A3[Event Grid]
-A4[Azure Function Parser]
-A5[SQL Insert Stored Procedure]
-A6[(Azure SQL Database)]
+A2[Azure Function CSV Parser]
+A3[Validation & Mapping]
+A4[SQL Insert Stored Procedure]
+A5[(Azure SQL Database)]
 end
 
 subgraph Traditional_Search
-B1[Web Form UI]
-B2[Form → JSON Converter]
+B1[Search Form UI]
+B2[Form → JSON]
 B3[REST API]
 B4[Stored Procedure Execution]
 end
@@ -112,17 +102,74 @@ end
 subgraph AI_Search
 C1[User Prompt]
 C2[ChatGPT / Azure OpenAI]
-C3[System Prompt<br>Azure SQL Expert]
-C4[NLP → SQL Parameters]
-C5[Stored Procedure Execution]
+C3[System Prompt SQL Expert]
+C4[NLP → Stored Procedure]
 end
 
-A1 --> A2 --> A3 --> A4 --> A5 --> A6
+A1 --> A2 --> A3 --> A4 --> A5
 
-B1 --> B2 --> B3 --> B4 --> A6
+B1 --> B2 --> B3 --> B4 --> A5
 
-C1 --> C2 --> C3 --> C4 --> C5 --> A6
+C1 --> C2 --> C3 --> C4 --> B3
 ```
+
+---
+
+# What This Updated Flow Represents
+
+### CSV Data Ingestion
+
+```
+CSV Upload
+   ↓
+Azure Function Parser
+   ↓
+Validation / Mapping
+   ↓
+Stored Procedure Insert
+   ↓
+Azure SQL
+```
+
+### Traditional Search
+
+```
+Search Form
+   ↓
+Convert Input → JSON
+   ↓
+REST API
+   ↓
+Stored Procedure
+   ↓
+Azure SQL
+```
+
+### AI Search
+
+```
+Natural Language Prompt
+   ↓
+Azure OpenAI
+   ↓
+System Prompt (SQL Expert)
+   ↓
+Generate Stored Procedure Call
+   ↓
+Execute Normal Query Flow
+```
+
+---
+
+If you'd like, I can also produce a **much more visually structured Mermaid diagram with colored architecture boundaries** showing:
+
+* **Data Ingestion Layer**
+* **API Layer**
+* **AI Layer**
+* **Data Layer**
+* **Presentation Layer**
+
+This style is **excellent for architecture decks and GitHub documentation** (especially for the **AI-enabled search solution you’re building**).
 
 ---
 
