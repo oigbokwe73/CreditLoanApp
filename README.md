@@ -7,7 +7,7 @@
 
 # 🔥 Executive Summary
 
-Fringe Financial Services is modernizing its loan data platform by introducing a scalable **Azure-based ingestion and intelligent search architecture** while preserving existing operational systems. Loan application records will be **bulk uploaded via an Azure Function upload service**, where CSV or structured files are validated, transformed, and securely inserted into **Azure SQL Database** using the organization’s existing stored procedures. This approach ensures seamless integration with current data models and minimizes disruption to established processes.
+Fringe Financial Services is modernizing its loan data platform by introducing a scalable **Azure-based ingestion and intelligent search architecture** while preserving existing operational systems. Loan application records will be **bulk uploaded via an Azure Function**, where CSV or structured files are validated, transformed, and securely inserted into **Azure SQL Database** using the organization’s existing stored procedures. This approach ensures seamless integration with current data models and minimizes disruption to established processes.
 
 End users will continue to leverage the **traditional search interface** to retrieve loan information using familiar filters and queries, maintaining compatibility with the existing application workflows and stored procedures already optimized for performance and reporting.
 
