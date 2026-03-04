@@ -43,7 +43,7 @@ E --> F[(Azure SQL Database<br>creditapplication Table)]
 %% =============================
 
 subgraph Traditional_Search
-I[Web Search Form] --> J[User Inputs Filters<br>Credit Score, Purpose, Income]
+I[Web Search Form] --> J[User Inputs Filters Credit Score, Purpose, Income]
 
 J --> K[Convert Form Data to JSON]
 
