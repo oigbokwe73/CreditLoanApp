@@ -333,6 +333,59 @@ CREATE TABLE dbo.CreditApplication
 );
 ```
 
+```sql
+CREATE OR ALTER PROCEDURE dbo.usp_GetTopCreditApplications
+(
+    @MinCreditScore INT = NULL,
+    @MaxCreditScore INT = NULL,
+    @Purpose NVARCHAR(100) = NULL,
+    @Homeownership NVARCHAR(100) = NULL,
+    @Term NVARCHAR(100) = NULL,
+    @TopN INT = 100
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT TOP (@TopN)
+        LoanID,
+        CustomerID,
+        CurrentLoanAmount,
+        Term,
+        CreditScore,
+        AnnualIncome,
+        Years_in_current_job,
+        Home_Ownership,
+        Purpose,
+        Monthly_Debt,
+        Years_of_Credit_History,
+        Number_of_Open_Accounts,
+        Number_of_Credit_Problems,
+        Current_Credit_Balance,
+        Maximum_Open_Credit,
+        Bankruptcies,
+        Tax_Liens
+    FROM dbo.CreditApplication
+    WHERE
+        -- Credit Score Filter
+        (@MinCreditScore IS NULL OR TRY_CAST(CreditScore AS INT) >= @MinCreditScore)
+        AND (@MaxCreditScore IS NULL OR TRY_CAST(CreditScore AS INT) <= @MaxCreditScore)
+
+        -- Purpose Filter
+        AND (@Purpose IS NULL OR Purpose = @Purpose)
+
+        -- Home Ownership Filter
+        AND (@Homeownership IS NULL OR Home_Ownership = @Homeownership)
+
+        -- Term Filter
+        AND (@Term IS NULL OR Term = @Term)
+
+    ORDER BY
+        TRY_CAST(CreditScore AS INT) DESC,
+        TRY_CAST(CurrentLoanAmount AS BIGINT) DESC;
+END;
+```
+
 ---
 
 # ⚙️ Notes
