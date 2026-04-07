@@ -239,7 +239,16 @@ EXEC usp_GetCreditApplications
  @MaxCreditScore = 750,
  @Purpose = 'Debt Consolidation'
 ```
-
+```json
+{
+    "MinCreditScore": 700,
+    "MaxCreditScore": 750,
+    "Purpose": "Debt Consolidation",
+    "HomeOwnership": "Home Mortgage",
+    "Term": "Short Term",
+    "Top": "300"
+}
+```
 ---
 
 # Example NLP Query
