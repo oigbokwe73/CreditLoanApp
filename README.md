@@ -249,6 +249,12 @@ EXEC usp_GetCreditApplications
     "Top": "300"
 }
 ```
+
+```json
+{
+    "search": "Show vacation loans that are related to renters with a credit score between 600 and 720.Return the first 1000 records"
+}
+```
 ---
 
 # Example NLP Query
