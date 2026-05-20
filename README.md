@@ -239,7 +239,22 @@ EXEC usp_GetCreditApplications
  @MaxCreditScore = 750,
  @Purpose = 'Debt Consolidation'
 ```
+```json
+{
+    "MinCreditScore": 700,
+    "MaxCreditScore": 750,
+    "Purpose": "Debt Consolidation",
+    "HomeOwnership": "Home Mortgage",
+    "Term": "Short Term",
+    "Top": "300"
+}
+```
 
+```json
+{
+    "search": "Show vacation loans that are related to renters with a credit score between 600 and 720.Return the first 1000 records"
+}
+```
 ---
 
 # Example NLP Query
@@ -291,6 +306,98 @@ This is a **very powerful enterprise pattern**.
 
 ---
 
+
+---
+
+Below is the exact **CREATE TABLE** statement using **NVARCHAR(100)** for *every listed column*, exactly as requested.
+
+---
+
+# ✅ **SQL Table: CreditApplication (All Columns NVARCHAR(100))**
+
+```sql
+CREATE TABLE dbo.CreditApplication
+(
+    LoanID                         NVARCHAR(100) NULL,
+    CustomerID                     NVARCHAR(100) NULL,
+    CurrentLoanAmount              NVARCHAR(100) NULL,
+    Term                           NVARCHAR(100) NULL,
+    CreditScore                    NVARCHAR(100) NULL,
+    AnnualIncome                   NVARCHAR(100) NULL,
+    Years_in_current_job           NVARCHAR(100) NULL,
+    Home_Ownership                 NVARCHAR(100) NULL,
+    Purpose                        NVARCHAR(100) NULL,
+    Monthly_Debt                   NVARCHAR(100) NULL,
+    Years_of_Credit_History        NVARCHAR(100) NULL,
+    Months_since_last_delinquent   NVARCHAR(100) NULL,
+    Number_of_Open_Accounts        NVARCHAR(100) NULL,
+    Number_of_Credit_Problems      NVARCHAR(100) NULL,
+    Current_Credit_Balance         NVARCHAR(100) NULL,
+    Maximum_Open_Credit            NVARCHAR(100) NULL,
+    Bankruptcies                   NVARCHAR(100) NULL,
+    Tax_Liens                      NVARCHAR(100) NULL
+);
+```
+
+```sql
+CREATE OR ALTER PROCEDURE dbo.usp_GetTopCreditApplications
+(
+    @MinCreditScore INT = NULL,
+    @MaxCreditScore INT = NULL,
+    @Purpose NVARCHAR(100) = NULL,
+    @Homeownership NVARCHAR(100) = NULL,
+    @Term NVARCHAR(100) = NULL,
+    @TopN INT = 100
+)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT TOP (@TopN)
+        LoanID,
+        CustomerID,
+        CurrentLoanAmount,
+        Term,
+        CreditScore,
+        AnnualIncome,
+        Years_in_current_job,
+        Home_Ownership,
+        Purpose,
+        Monthly_Debt,
+        Years_of_Credit_History,
+        Number_of_Open_Accounts,
+        Number_of_Credit_Problems,
+        Current_Credit_Balance,
+        Maximum_Open_Credit,
+        Bankruptcies,
+        Tax_Liens
+    FROM dbo.CreditApplication
+    WHERE
+        -- Credit Score Filter
+        (@MinCreditScore IS NULL OR TRY_CAST(CreditScore AS INT) >= @MinCreditScore)
+        AND (@MaxCreditScore IS NULL OR TRY_CAST(CreditScore AS INT) <= @MaxCreditScore)
+
+        -- Purpose Filter
+        AND (@Purpose IS NULL OR Purpose = @Purpose)
+
+        -- Home Ownership Filter
+        AND (@Homeownership IS NULL OR Home_Ownership = @Homeownership)
+
+        -- Term Filter
+        AND (@Term IS NULL OR Term = @Term)
+
+    ORDER BY
+        TRY_CAST(CreditScore AS INT) DESC,
+        TRY_CAST(CurrentLoanAmount AS BIGINT) DESC;
+END;
+```
+
+---
+
+# ⚙️ Notes
+
+* Every column is **NVARCHAR(100)** as requested ( no numeric, no GUID, no decimal types ).
+* This makes CSV imports simple and avoids type conflicts.
 
 ---
 
