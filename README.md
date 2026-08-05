@@ -481,6 +481,7 @@ By following these steps, you'll have a serverless API in Azure that uses Servic
 |AppName| [APPLICATION NAME]| This is the name of the Function App, used in log analytics|
 |DatabaseConnection|[DATABASE CONNECTION STRING]|Example  "DatabaseConnection". Recommmended to store in Key vault.|
 
+> **Note:**  add CORS entry https://www.xenhey.com to create function app
 
 > **Note:**  Look at the configuration file in the **Config** Folder and created a Table to record information.
 
